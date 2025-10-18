@@ -5,7 +5,7 @@ export default function MainLayout() {
     return (
         <>
             <Menu />
-            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "16px" }}>
+            <div style={{ maxWidth: 1440, margin: "0 auto", padding: 16 }}> {/* було 1100 */}
                 <Outlet />
             </div>
         </>

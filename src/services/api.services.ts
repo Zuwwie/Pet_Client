@@ -1,16 +1,12 @@
-import type {IUser} from "../../models/IUser.ts";
+import axios, {type AxiosInstance } from "axios";
 
-export const getAllUsers = async (): Promise<IUser[]> => {
+export const api: AxiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_API_URL_USERS ?? "http://localhost:3001/api/",
+    withCredentials: true,
+});
 
-    let users = await fetch(import.meta.env.VITE_API_URL_USERS)
-        .then((value) => value.json());
-
-    return users;
-}
-
-export const getUserById = async (id: string): Promise<IUser> => {
-    let user = await fetch(import.meta.env.VITE_API_URL_USERS + `${id}`)
-        .then((value) => value.json());
-
-    return user;
-}
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});

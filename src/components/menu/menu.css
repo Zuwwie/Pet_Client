@@ -1,12 +1,12 @@
-/* ===== Topbar (збільшений, без hover, без зміни розміру при кліку) ===== */
 :root {
-    --bg: #ffffff;
+    --bg: #fff;
     --text: #0f172a;
     --muted: #94a3b8;
     --border: #e5e7eb;
     --brand: #2563eb;
 }
 
+/* Topbar */
 .topbar {
     position: sticky;
     top: 0;
@@ -26,7 +26,6 @@
     gap: 18px;
 }
 
-/* Ліва частина */
 .topbar__left {
     display: flex;
     align-items: center;
@@ -50,39 +49,39 @@
     font-size: 22px;
     line-height: 1;
     color: var(--brand);
-    letter-spacing: -0.3px;
+    letter-spacing: -.3px;
 }
 
-/* Навігація */
 .mainnav {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 18px;
     font-weight: 700;
 }
 
-/* БАЗА = АКТИВНИЙ (щоб не мінявся розмір) */
 .navlink {
-    padding: 15px 21px; /* було 10px 16px */
-    border-radius: 12px; /* трохи більше заокруглення */
+    padding: 15px 21px;
+    border-radius: 12px;
     font-size: 15px;
     color: var(--text);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     line-height: 1;
-    transition: none; /* без hover-анімацій */
-    -webkit-tap-highlight-color: transparent; /* без синього підсвічування на мобільних */
+    transition: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .navlink:active {
     transform: none;
 }
 
-/* на всяк випадок — без масштабування */
+.navlink--active {
+    background: #0f172a;
+    color: #fff;
+}
 
-/* Іконка у "Кошик" */
 .navlink--icon .icon {
     display: inline-flex;
     align-items: center;
@@ -94,23 +93,66 @@
     height: 20px;
 }
 
-/* Активний пункт — тільки фон/колір, БЕЗ зміни padding! */
-.navlink--active {
-    background: #0f172a;
-    color: #ffffff;
+/* Cart */
+.navlink--cart {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* Бейдж кошика */
-.badge {
-    margin-left: 8px;
-    padding: 3px 8px;
-    font-size: 13px;
+.cart-pill {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 10px; /* між групами */
+    height: 26px;
+    padding: 0 8px;
     border-radius: 999px;
-    background: #111827;
-    color: #fff;
+    background: rgba(17, 24, 39, .08);
+    color: #111827;
+    border: 1px solid rgba(17, 24, 39, .08);
+    font-size: 12px;
+    font-weight: 700;
 }
 
-/* Права частина */
+.pill-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* іконка ↔ число */
+.pill-ico {
+    width: 16px;
+    height: 16px;
+    stroke: #2563eb;
+    fill: none;
+    flex: 0 0 16px;
+}
+
+.unit, .uah-word {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Активний кошик на темному фоні */
+.navlink--active.navlink--cart .cart-pill {
+    background: rgba(255, 255, 255, .14);
+    color: #fff;
+    border-color: transparent;
+}
+
+.navlink--active.navlink--cart .pill-ico {
+    stroke: #9cc2ff;
+}
+
+.navlink--active.navlink--cart .unit,
+.navlink--active.navlink--cart .uah-word {
+    color: #cbd5e1;
+}
+
+/* Right */
 .topbar__right {
     display: flex;
     align-items: center;
@@ -143,12 +185,9 @@
     cursor: pointer;
 }
 
-/* Адаптив */
-@media (max-width: 900px) {
-    .mainnav {
-        gap: 18px;
-    }
 
+/* Responsive */
+@media (max-width: 900px) {
     .brand__text {
         font-size: 20px;
     }
@@ -157,6 +196,102 @@
         padding: 14px 19px;
         font-size: 14.5px;
     }
+}
 
-    /* трошки компактніше на вузьких */
+/* Трішки нижча кнопка Кошик у вибраному стані */
+.navlink--active.navlink--cart {
+    padding-top: 12px; /* було 15px */
+    padding-bottom: 12px;
+}
+
+/* Щоб контент лишався центрованим */
+.navlink--active.navlink--cart .icon svg {
+    vertical-align: middle;
+}
+
+/* ЩІЛЬНІ МІЖ НАВ-ЕЛЕМЕНТАМИ + ПАДАЄ ВНИЗ, ЯКЩО НЕ ВМІЩАЄТЬСЯ */
+.topbar__inner {
+    height: auto; /* дозволяємо зростати по висоті */
+    min-height: 72px; /* базова висота зберігається */
+}
+
+/* навігація заповнює доступний простір і може переноситись */
+.mainnav {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap; /* <-- перенос у новий ряд */
+    column-gap: 10px; /* було більше — зменшили відступи між: Каталог • Кошик • Замовлення */
+    row-gap: 6px; /* вертикальний відступ між рядками */
+}
+
+/* трішки щільніші кнопки (не обов’язково, але допомагає вміститись) */
+.navlink {
+    padding: 12px 16px; /* було 15px 21px */
+}
+
+/* на вузьких екранах ще компактніше */
+@media (max-width: 900px) {
+    .mainnav {
+        column-gap: 8px;
+        row-gap: 6px;
+    }
+
+    .navlink {
+        padding: 11px 14px;
+    }
+}
+
+/* —— Перемикач режиму замовлень у меню —— */
+.orders-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    color: #0f172a;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.orders-switch__label {
+    user-select: none;
+}
+
+.orders-switch__track {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    border-radius: 999px;
+    background: #cbd5e1;
+}
+
+.orders-switch__thumb {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #9ca3af;
+    transition: left .18s ease, background .18s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+}
+
+.orders-switch--on {
+    background: #e0f2fe;
+    border-color: #bae6fd;
+}
+
+.orders-switch--on .orders-switch__track {
+    background: #bfdbfe;
+}
+
+.orders-switch--on .orders-switch__thumb {
+    left: 11px;
+    background: #3b82f6;
 }

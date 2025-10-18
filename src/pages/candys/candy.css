@@ -1,0 +1,204 @@
+/* ========== CandyShop — Product Cards (dense, 6-cols) ========== */
+
+/* --------- СІТКА --------- */
+/* 1 мобільний, 2 ≥768, 4 ≥1024, 5 ≥1280, 6 ≥1536 */
+.products-grid{
+    display:grid;
+    gap:12px;
+    grid-template-columns:repeat(1,minmax(0,1fr));
+}
+@media (min-width:768px){
+    .products-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (min-width:1024px){
+    .products-grid{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+@media (min-width:1280px){
+    .products-grid{ grid-template-columns:repeat(5,minmax(0,1fr)); }
+}
+@media (min-width:1536px){
+    .products-grid{ grid-template-columns:repeat(6,minmax(0,1fr)); }
+}
+
+/* --------- КАРТКА (щільніша) --------- */
+.product-card{
+    box-sizing:border-box;
+    border-radius:12px;
+    background:#fff;
+    padding:clamp(10px,1.2vw,14px);
+    overflow:hidden;
+    box-shadow:0 0 0 1px #e5e7eb inset, 0 1px 2px rgba(15,23,42,.04);
+
+    /* компактніший медіаблок */
+    --media-ratio: 4 / 3;
+    --media-min: clamp(120px, 18vw, 170px);
+
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+}
+
+/* --------- МЕДІАБЛОК --------- */
+.product-media{
+    aspect-ratio: var(--media-ratio);
+    min-height: var(--media-min);
+    padding: clamp(8px, 1vw, 12px);
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    margin-bottom:clamp(8px, 1.2vw, 12px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+.product-media img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+}
+.product-media .ph{ width:56px; height:56px; opacity:.55; }
+
+/* --------- Хедер: заголовок + бейдж --------- */
+.product-header{
+    display:grid;
+    grid-template-columns:1fr auto;
+    align-items:start;
+    gap:6px 10px;
+    margin-bottom:6px;
+}
+.product-title{
+    margin:0;
+    font-size:clamp(16px,1.4vw,20px);
+    font-weight:800;
+    color:#0f172a;
+    line-height:1.15; /* щільніше */
+    word-break:break-word;
+    min-width:0;
+}
+.badge-pill{
+    background:#0f172a;
+    color:#fff;
+    padding:5px 10px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:12px;
+    line-height:1.1;
+    white-space:nowrap;
+}
+
+/* --------- Опис (опційно) --------- */
+.product-sub{
+    margin:2px 0 10px;
+    color:#475569;
+    font-size:clamp(13px,1.3vw,15px);
+    line-height:1.2; /* менше міжряддя */
+}
+
+/* --------- Характеристики (2 колонки) --------- */
+.kv{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:12px;
+    row-gap:6px;
+    margin:0 0 10px;
+    font-size:clamp(12px,1.2vw,14px);
+    line-height:1.2;
+}
+.kv .label{ color:#334155; }
+.kv .value{ color:#0f172a; font-weight:800; text-align:right; }
+
+/* --------- ЛІЧИЛЬНИК – [input] + (компактний, без переповнення) --------- */
+.qty-row{ margin-top:2px; }
+.qty-controls{
+    --ctrl: clamp(30px, 4.2vw, 40px);
+    --gap:  clamp(6px, 1.2vw, 8px);
+    --radius: clamp(8px, 1.2vw, 10px);
+
+    display:grid;
+    grid-template-columns: minmax(28px,var(--ctrl)) minmax(0,1fr) minmax(28px,var(--ctrl));
+    gap:var(--gap);
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+.qty-btn{
+    width:auto;
+    min-width:28px;
+    height:var(--ctrl);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #e5e7eb;
+    background:#fff;
+    border-radius:var(--radius);
+    font-size:clamp(16px,2.2vw,20px);
+    line-height:1;
+    cursor:pointer;
+    user-select:none;
+    transition:none;
+}
+.qty-btn:active{ transform:none; }
+.qty-input{
+    height:var(--ctrl);
+    width:100%;
+    min-width:0;
+    text-align:center;
+    border:1px solid #e5e7eb;
+    border-radius:var(--radius);
+    font-size:clamp(14px,1.6vw,16px);
+    line-height:1;
+    outline:none;
+}
+/* прибираємо стрілки */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.qty-input[type="number"]{ -moz-appearance:textfield; }
+
+/* --------- Підрахунок під лічильником --------- */
+.per-piece{
+    text-align:center;
+    color:#334155;
+    margin:clamp(6px,1.2vw,10px) 0 clamp(8px,1.4vw,12px);
+    font-weight:800;
+    font-size:clamp(13px,1.3vw,15px);
+    line-height:1.15;
+}
+
+/* --------- Кнопка --------- */
+.add-btn{
+    margin-top:auto;
+    width:100%;
+    height:clamp(40px,5vw,48px);
+    border:0;
+    border-radius:clamp(10px,1.2vw,12px);
+    cursor:pointer;
+    background:#0f172a;
+    color:#fff;
+    font-size:clamp(14px,1.6vw,16px);
+    line-height:1;
+    font-weight:800;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+.add-btn svg{ width:clamp(14px,1.8vw,18px); height:clamp(14px,1.8vw,18px); }
+
+/* --------- Стани --------- */
+.error{ color:#b91c1c; }
+.muted{ color:#64748b; }
+
+/* --------- Skeleton --------- */
+.sk{
+    min-height:160px;
+    background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 37%,#f1f5f9 63%);
+    background-size:400% 100%;
+    animation:s 1.2s ease infinite;
+    border-radius:12px;
+}
+@keyframes s{
+    0%{ background-position:100% 50% }
+    100%{ background-position:0 50% }
+}
