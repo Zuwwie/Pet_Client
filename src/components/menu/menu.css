@@ -1,0 +1,162 @@
+/* ===== Topbar (збільшений, без hover, без зміни розміру при кліку) ===== */
+:root {
+    --bg: #ffffff;
+    --text: #0f172a;
+    --muted: #94a3b8;
+    --border: #e5e7eb;
+    --brand: #2563eb;
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar__inner {
+    height: 72px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+/* Ліва частина */
+.topbar__left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    min-width: 0;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.brand__emoji {
+    font-size: 24px;
+}
+
+.brand__text {
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--brand);
+    letter-spacing: -0.3px;
+}
+
+/* Навігація */
+.mainnav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    font-weight: 700;
+}
+
+/* БАЗА = АКТИВНИЙ (щоб не мінявся розмір) */
+.navlink {
+    padding: 15px 21px; /* було 10px 16px */
+    border-radius: 12px; /* трохи більше заокруглення */
+    font-size: 15px;
+    color: var(--text);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1;
+    transition: none; /* без hover-анімацій */
+    -webkit-tap-highlight-color: transparent; /* без синього підсвічування на мобільних */
+}
+
+.navlink:active {
+    transform: none;
+}
+
+/* на всяк випадок — без масштабування */
+
+/* Іконка у "Кошик" */
+.navlink--icon .icon {
+    display: inline-flex;
+    align-items: center;
+}
+
+.navlink--icon .icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+/* Активний пункт — тільки фон/колір, БЕЗ зміни padding! */
+.navlink--active {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+/* Бейдж кошика */
+.badge {
+    margin-left: 8px;
+    padding: 3px 8px;
+    font-size: 13px;
+    border-radius: 999px;
+    background: #111827;
+    color: #fff;
+}
+
+/* Права частина */
+.topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: flex-end;
+}
+
+.user {
+    line-height: 1.1;
+    text-align: right;
+}
+
+.user__name {
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.user__role {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* Адаптив */
+@media (max-width: 900px) {
+    .mainnav {
+        gap: 18px;
+    }
+
+    .brand__text {
+        font-size: 20px;
+    }
+
+    .navlink {
+        padding: 14px 19px;
+        font-size: 14.5px;
+    }
+
+    /* трошки компактніше на вузьких */
+}
