@@ -295,3 +295,16 @@
     left: 11px;
     background: #3b82f6;
 }
+
+.user--link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.user--link .user__name {
+    color: var(--text);
+}
+
+.user--link .user__role {
+    color: var(--muted);
+}

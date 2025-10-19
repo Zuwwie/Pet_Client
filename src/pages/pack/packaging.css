@@ -1,0 +1,411 @@
+/* ================== PACKAGING PAGE — CLEAN ================== */
+
+/* Верх сторінки */
+.pack-page {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pack-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pack-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.pack-tools {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.btn.ghost, .btn.link {
+    background: #fff;
+}
+
+.btn.solid {
+    border: 0;
+    background: #0f172a;
+    color: #fff;
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.pack-selected {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.pack-selected .sel-name, .pack-selected .sel-price {
+    font-weight: 800;
+}
+
+.pack-selected .dot {
+    opacity: .5;
+}
+
+/* -------- Grid: 1 / 2 / 3 / 5 колонок -------- */
+.pack-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns:repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+    .pack-grid {
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .pack-grid {
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1280px) {
+    .pack-grid {
+        grid-template-columns:repeat(5, minmax(0, 1fr));
+    }
+}
+
+/* -------- Картка (вертикальна, велика фотозона) -------- */
+.pack-card {
+    --media-ratio: 9/16; /* ВЕЛИКА фотозона 9:16; змінюй класом нижче */
+    --media-pad: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+    box-shadow: 0 0 0 1px #e5e7eb inset, 0 1px 2px rgba(15, 23, 42, .04);
+    cursor: pointer;
+}
+
+.pack-card:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+}
+
+.pack-card.is-active {
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, .08), 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+/* Фотозона зверху */
+.pack-media {
+    width: 100%;
+    aspect-ratio: var(--media-ratio);
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    padding: var(--media-pad);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.pack-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+}
+
+/* Текст/дані під фото */
+.pack-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.pack-sub {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Низ картки */
+.pack-actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pack-price {
+    font-weight: 800;
+}
+
+.pack-hint {
+    font-size: 12px;
+    color: #64748b;
+    min-height: 16px;
+}
+
+.pack-hint.ok {
+    color: #15803d;
+}
+
+.pack-hint.bad {
+    color: #b91c1c;
+}
+
+.pack-btn {
+    width: 100%;
+}
+
+/* Міні-прев’ю у кошику (як було) */
+.pack-thumb {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 6px;
+}
+
+.pack-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Модифікатори пропорцій для окремих карток */
+.pack-card.is-3x4 {
+    --media-ratio: 3/4;
+}
+
+.pack-card.is-4x3 {
+    --media-ratio: 4/3;
+}
+
+.pack-card.is-square {
+    --media-ratio: 1/1;
+}
+
+.pack-card.is-tall {
+    --media-ratio: 1/2;
+}
+
+/* ще вища фотозона */
+
+/* На дуже вузьких екранах дати трохи "повітря" */
+@media (max-width: 480px) {
+    .pack-card {
+        --media-pad: 6px;
+    }
+}
+
+/* ================== CANDY CARD (детальна як на скріні) ================== */
+
+.candy-card {
+    --media-ratio: 9/16; /* велика портретна фотозона зверху */
+    --pad: 12px;
+    background: #fff;
+    border-radius: 16px;
+    padding: var(--pad);
+    box-shadow: 0 0 0 1px #e5e7eb inset, 0 2px 6px rgba(15, 23, 42, .04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.candy-media {
+    width: 100%;
+    aspect-ratio: var(--media-ratio);
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.candy-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+}
+
+.candy-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.candy-title {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 16px;
+    background: #0f172a;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.candy-meta {
+    display: grid;
+    grid-template-columns:auto 1fr;
+    gap: 8px 16px;
+    align-items: center;
+    font-size: 16px;
+}
+
+.meta-label {
+    color: #6b7280;
+}
+
+.meta-value {
+    color: #0f172a;
+    font-weight: 800;
+    justify-self: end;
+}
+
+.qty {
+    display: grid;
+    grid-template-columns:64px 1fr 64px;
+    gap: 10px;
+    align-items: center;
+}
+
+.qty-btn {
+    height: 56px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-input {
+    height: 56px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    background: #fff;
+}
+
+.candy-eq {
+    text-align: center;
+    font-weight: 800;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.candy-buy {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 0;
+    background: #0f172a;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.candy-buy:active {
+    transform: none;
+}
+
+/* Перемикачі пропорцій за потреби */
+.candy-card.is-43 {
+    --media-ratio: 4/3;
+}
+
+.candy-card.is-square {
+    --media-ratio: 1/1;
+}
+
+.candy-card.is-tall {
+    --media-ratio: 1/2;
+}
+
+/* Степпер кількості для пакування */
+.pack-qty {
+    display: grid;
+    grid-template-columns:64px 1fr 64px;
+    gap: 10px;
+    align-items: center;
+}
+
+.pack-qty-btn {
+    height: 56px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pack-qty-input {
+    height: 56px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+}
