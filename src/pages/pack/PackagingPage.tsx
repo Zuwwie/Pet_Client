@@ -1,15 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+// src/pages/packaging/PackagingPage.tsx
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./packaging.css";
 
-import { PACKAGING_OPTIONS } from "@/services/packaging.options";
 import type { IPackaging } from "@/models/IPackaging";
-import { formatUAH, getTotals, addPack, getPackQty, onCartChange } from "@/cart/store.ts";
+import {
+    formatUAH,
+    getTotals,
+    addPack,
+    getPackQty,
+    onCartChange,
+    removePack,
+} from "@/cart/store.ts";
+import { usePackaging } from "@/services/packaging.service";
+import LazyImg from "@/components/LazyImg";
+
+const EAGER_COUNT = 8; // скільки перших карток грузимо одразу
 
 export default function PackagingPage() {
     const navigate = useNavigate();
 
-    // сума ваги з кошика цукерок (для підказки "вмістить/не вмістить")
+    // загальна вага з кошика (хінт "вмістить/не вмістить")
     const [totalWeightG, setTotalWeightG] = useState(0);
     useEffect(() => {
         const upd = () => setTotalWeightG(getTotals().totalWeightG);
@@ -17,11 +28,22 @@ export default function PackagingPage() {
         return onCartChange(upd);
     }, []);
 
-    // локальний стан степперів по картках (за замовчуванням 1)
+    // пакування з бекенду
+    const { data: options = [], isLoading, isError } = usePackaging();
+
+    // Діагностика - логування даних
+    useEffect(() => {
+        if (options.length > 0) {
+            console.log('Packaging data:', options);
+            const unavailable = options.filter(p => p.isAvailable === false);
+            console.log('Unavailable items:', unavailable);
+        }
+    }, [options]);
+
+    // локальні степпери (дефолт 1)
     const [qty, setQty] = useState<Record<string, number>>({});
     const setLocal = (id: string, v: number) =>
         setQty((m) => ({ ...m, [id]: Math.max(1, Math.floor(v) || 1) }));
-
     const dec = (id: string) => setLocal(id, (qty[id] ?? 1) - 1);
     const inc = (id: string) => setLocal(id, (qty[id] ?? 1) + 1);
 
@@ -32,20 +54,75 @@ export default function PackagingPage() {
         return ok ? "✅ вмістить поточну вагу" : "⚠️ не вмістить поточну вагу";
     };
 
+    // === Сортування: спочатку доступні, потім недоступні, всередині груп за ціною ===
     const items = useMemo(() => {
-        const arr = [...PACKAGING_OPTIONS];
-        arr.sort((a, b) => {
-            const isBagA = a.name.toLowerCase().includes("пакет");
-            const isBagB = b.name.toLowerCase().includes("пакет");
-            if (isBagA !== isBagB) return isBagA ? 1 : -1; // коробки спочатку
-            return (a.capacityG ?? 0) - (b.capacityG ?? 0);
-        });
-        return arr;
-    }, []);
+        const isAvail = (p: any) => p?.isAvailable !== false;
+        const priceOf = (p: any) =>
+            typeof p?.priceKop === "number" ? p.priceKop : Number.POSITIVE_INFINITY;
 
-    // щоб картки оновлювали «В кошику N» при зміні з інших сторінок
+        const arr = [...options];
+        arr.sort((a: any, b: any) => {
+            const avA = isAvail(a) ? 1 : 0;
+            const avB = isAvail(b) ? 1 : 0;
+            if (avA !== avB) return avB - avA; // доступні — першими
+
+            const pa = priceOf(a);
+            const pb = priceOf(b);
+            if (pa !== pb) return pa - pb; // від дешевих до дорогих
+
+            return String(a?.name ?? "").localeCompare(String(b?.name ?? ""), "uk");
+        });
+
+        console.log('Sorted items:', arr.map(item => ({
+            name: item.name,
+            isAvailable: item.isAvailable,
+            priceKop: item.priceKop
+        })));
+
+        return arr;
+    }, [options]);
+
+    // щоб «В кошику N» оновлювалось при змінах з інших сторінок
     const [, force] = useState(0);
     useEffect(() => onCartChange(() => force((x) => x + 1)), []);
+
+    // зелений стан кнопки "Додано" (2с)
+    const [flash, setFlash] = useState<Record<string, boolean>>({});
+    const timersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+    useEffect(() => {
+        return () => Object.values(timersRef.current).forEach(clearTimeout);
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="pack-page">
+                <div className="pack-head">
+                    <h1 className="pack-title">Пакування</h1>
+                    <div className="pack-tools">
+                        <button className="btn link" type="button" onClick={() => navigate("/basket")}>
+                            До кошика
+                        </button>
+                    </div>
+                </div>
+                <div className="pack-grid">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="product-card sk" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="pack-page">
+                <div className="pack-head">
+                    <h1 className="pack-title">Пакування</h1>
+                </div>
+                <p className="error">Не вдалось завантажити пакування</p>
+            </div>
+        );
+    }
 
     return (
         <div className="pack-page">
@@ -59,20 +136,42 @@ export default function PackagingPage() {
             </div>
 
             <div className="pack-grid">
-                {items.map((p) => {
-                    const id = (p as any).id ?? (p as any)._id;
+                {items.map((p, i) => {
+                    const id = String((p as any).id ?? (p as any)._id);
                     const hint = hintFor(p);
-                    const inCartQty = getPackQty(id); // скільки вже в кошику
+                    const inCartQty = getPackQty(id);
                     const q = qty[id] ?? 1;
+                    const isAvailable = p.isAvailable !== false; // перевірка наявності
+
+                    console.log(`Rendering ${p.name}, isAvailable: ${p.isAvailable}, computed: ${isAvailable}`);
+
+                    const onAdd = () => {
+                        if (!isAvailable) return;
+                        addPack(p, q);
+                        setLocal(id, 1);
+                        setFlash((s) => ({ ...s, [id]: true }));
+                        if (timersRef.current[id]) clearTimeout(timersRef.current[id]);
+                        timersRef.current[id] = setTimeout(() => {
+                            setFlash((s) => ({ ...s, [id]: false }));
+                        }, 2000);
+                    };
+
+                    const onRemoveAll = () => removePack(id);
 
                     return (
-                        <article key={id} className="pack-card is-vertical">
+                        <article key={id} className={`pack-card is-vertical ${!isAvailable ? 'not-available' : ''}`}>
                             <div className="pack-media">
                                 {p.imageUrl ? (
-                                    <img src={p.imageUrl} alt={p.name} loading="lazy" decoding="async" />
+                                    <LazyImg
+                                        src={p.imageUrl}
+                                        alt={p.name}
+                                        eager={i < EAGER_COUNT}
+                                        className="pack-img"
+                                    />
                                 ) : (
                                     <div className="ph">🎁</div>
                                 )}
+                                {!isAvailable && <div className="availability-overlay">Немає в наявності</div>}
                             </div>
 
                             <h3 className="pack-name">{p.name}</h3>
@@ -88,25 +187,51 @@ export default function PackagingPage() {
                                     <div className="pack-hint">&nbsp;</div>
                                 )}
 
-                                {/* Степпер кількості */}
+                                {/* степпер */}
                                 <div className="pack-qty">
-                                    <button className="pack-qty-btn" type="button" onClick={() => dec(id)}>−</button>
+                                    <button
+                                        className="pack-qty-btn"
+                                        type="button"
+                                        onClick={() => dec(id)}
+                                        disabled={!isAvailable}
+                                    >−</button>
                                     <div className="pack-qty-input">{q}</div>
-                                    <button className="pack-qty-btn" type="button" onClick={() => inc(id)}>+</button>
+                                    <button
+                                        className="pack-qty-btn"
+                                        type="button"
+                                        onClick={() => inc(id)}
+                                        disabled={!isAvailable}
+                                    >+</button>
                                 </div>
 
-                                {/* Кнопка додати */}
+                                {/* додати */}
                                 <button
-                                    className="btn solid pack-btn"
+                                    className={`btn solid pack-btn${flash[id] ? " is-green" : ""}${!isAvailable ? " disabled" : ""}`}
                                     type="button"
-                                    onClick={() => { addPack(p, q); setLocal(id, 1); }}
+                                    onClick={onAdd}
+                                    disabled={!isAvailable}
+                                    aria-live="polite"
                                 >
-                                    Додати {q > 1 ? `×${q}` : ""} в кошик
+                                    {!isAvailable
+                                        ? "Немає в наявності"
+                                        : (flash[id]
+                                                ? "Додано"
+                                                : <>Додати {q > 1 ? `×${q}` : ""} в кошик</>
+                                        )
+                                    }
                                 </button>
 
-                                {/* Бейдж скільки вже додано */}
                                 {inCartQty > 0 ? (
-                                    <div className="pack-hint ok">В кошику: {inCartQty}</div>
+                                    <div className="pack-inline">
+                                        <div className="in-cart-pill" title="Кількість у кошику">
+                                            <span className="in-cart-dot" aria-hidden />
+                                            <span className="in-cart-label">Кошик</span>
+                                            <span className="in-cart-count">{inCartQty}</span>
+                                        </div>
+                                        <button className="btn danger ghost pack-remove" type="button" onClick={onRemoveAll}>
+                                            Видалити
+                                        </button>
+                                    </div>
                                 ) : (
                                     <div className="pack-hint">&nbsp;</div>
                                 )}

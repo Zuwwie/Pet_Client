@@ -1,21 +1,17 @@
 /* ========== CandyShop / Catalog ========== */
 
 /* ---- Utils ---- */
-.error { color:#b91c1c; }
-.muted { color:#64748b; }
+.error { color: #b91c1c; }
+.muted { color: #64748b; }
 
 /* =========================================
-   GRID: product cards (1/2/4/5/6 columns)
+   GRID: product cards (auto-fill)
 ========================================= */
 .products-grid{
     display:grid;
     gap:12px;
-    grid-template-columns:repeat(1,minmax(0,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
 }
-@media (min-width:768px){  .products-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (min-width:1024px){ .products-grid{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
-@media (min-width:1280px){ .products-grid{ grid-template-columns:repeat(5,minmax(0,1fr)); } }
-@media (min-width:1536px){ .products-grid{ grid-template-columns:repeat(6,minmax(0,1fr)); } }
 
 /* =========================================
    CARD view
@@ -25,247 +21,299 @@
     background:#fff;
     padding:clamp(10px,1.2vw,14px);
     overflow:hidden;
-    box-shadow:0 0 0 1px #e5e7eb inset, 0 1px 2px rgba(15,23,42,.04);
-    display:flex; flex-direction:column; min-height:100%;
-    --media-ratio: 4/3;
-    --media-min: clamp(120px,18vw,170px);
+    box-shadow:0 0 0 1px #e5e7eb inset,0 1px 2px rgba(15,23,42,.04);
+    display:flex;flex-direction:column;min-height:100%;
+    --media-ratio:4/3; --media-min:clamp(120px,18vw,170px);
 }
-
 .product-media{
     aspect-ratio:var(--media-ratio);
     min-height:var(--media-min);
     padding:clamp(8px,1vw,12px);
-    background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px;
+    background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;
     margin-bottom:clamp(8px,1.2vw,12px);
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
-.product-media img{ width:100%; height:100%; object-fit:contain; display:block; }
-.product-media .ph{ width:56px; height:56px; opacity:.55; }
+.product-media img{width:100%;height:100%;object-fit:contain;display:block;}
+.product-media .ph{width:56px;height:56px;opacity:.55;}
 
-.product-header{
-    display:grid; grid-template-columns:1fr auto; align-items:start; gap:6px 10px; margin-bottom:6px;
-}
-.product-title{
-    margin:0; font-size:clamp(16px,1.4vw,20px); font-weight:800; color:#0f172a; line-height:1.15; word-break:break-word; min-width:0;
-}
-
-/* availability badge on cards */
+.product-header{display:grid;grid-template-columns:1fr auto;align-items:start;gap:6px 10px;margin-bottom:6px;}
+.product-title{margin:0;font-size:clamp(16px,1.4vw,20px);font-weight:800;color:#0f172a;line-height:1.15;word-break:break-word;min-width:0;}
 .badge-pill{
-    background:#0f172a; color:#fff; padding:6px 12px; border-radius:999px;
-    font-weight:800; font-size:12px; line-height:1; white-space:nowrap;
+    background:#0f172a;color:#fff;padding:6px 12px;border-radius:999px;
+    font-weight:800;font-size:12px;line-height:1;white-space:nowrap;
 }
 
-.kv{
-    display:grid; grid-template-columns:1fr 1fr; column-gap:12px; row-gap:6px;
-    margin:0 0 10px; font-size:clamp(12px,1.2vw,14px); line-height:1.2;
-}
-.kv .label{ color:#334155; } .kv .value{ color:#0f172a; font-weight:800; text-align:right; }
+.kv{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;row-gap:6px;margin:0 0 10px;font-size:clamp(12px,1.2vw,14px);line-height:1.2;}
+.kv .label{color:#334155;}
+.kv .value{color:#0f172a;font-weight:800;text-align:right;}
 
-/* quantity controls (shared) */
-.qty-controls{
-    --ctrl: clamp(30px,4.2vw,40px);
-    --gap:  clamp(6px,1.2vw,8px);
-    --radius: clamp(8px,1.2vw,10px);
-    display:grid; grid-template-columns: minmax(28px,var(--ctrl)) minmax(0,1fr) minmax(28px,var(--ctrl));
-    gap:var(--gap); width:100%; max-width:100%; min-width:0;
-}
-.qty-btn{
-    min-width:28px; height:var(--ctrl);
-    display:inline-flex; align-items:center; justify-content:center;
-    border:1px solid #e5e7eb; background:#fff; border-radius:var(--radius);
-    font-size:clamp(16px,2.2vw,20px); line-height:1; cursor:pointer; user-select:none;
-}
-.qty-input{
-    height:var(--ctrl); width:100%; min-width:0; text-align:center;
-    border:1px solid #e5e7eb; border-radius:var(--radius);
-    font-size:clamp(14px,1.6vw,16px); line-height:1; outline:none;
-}
-.qty-input::-webkit-outer-spin-button,
-.qty-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-.qty-input[type="number"]{ -moz-appearance:textfield; }
-
-.per-piece{
-    text-align:center; color:#334155; margin:clamp(6px,1.2vw,10px) 0 clamp(8px,1.4vw,12px);
-    font-weight:800; font-size:clamp(13px,1.3vw,15px); line-height:1.15;
-}
-
-.add-btn{
-    margin-top:auto; width:100%; height:clamp(40px,5vw,48px);
-    border:0; border-radius:clamp(10px,1.2vw,12px); cursor:pointer;
-    background:#0f172a; color:#fff; font-size:clamp(14px,1.6vw,16px); font-weight:800;
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-}
-
-/* skeleton */
-.sk{
-    min-height:160px; border-radius:12px;
-    background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 37%,#f1f5f9 63%);
-    background-size:400% 100%; animation:s 1.2s ease infinite;
-}
-@keyframes s{ 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+/* quantity controls (cards) */
+.qty-controls{--ctrl:clamp(30px,4.2vw,40px);--gap:clamp(6px,1.2vw,8px);--radius:clamp(8px,1.2vw,10px);
+    display:grid;grid-template-columns:minmax(28px,var(--ctrl)) minmax(0,1fr) minmax(28px,var(--ctrl));
+    gap:var(--gap);width:100%;max-width:100%;min-width:0;}
+.qty-btn{min-width:28px;height:var(--ctrl);display:inline-flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;background:#fff;border-radius:var(--radius);font-size:clamp(16px,2.2vw,20px);line-height:1;cursor:pointer;user-select:none;}
+.qty-input{height:var(--ctrl);width:100%;min-width:0;text-align:center;border:1px solid #e5e7eb;border-radius:var(--radius);font-size:clamp(14px,1.6vw,16px);line-height:1;outline:none;}
+.qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.qty-input[type="number"]{-moz-appearance:textfield;}
+.per-piece{text-align:center;color:#334155;margin:clamp(6px,1.2vw,10px) 0 clamp(8px,1.4vw,12px);font-weight:800;font-size:clamp(13px,1.3vw,15px);line-height:1.15;}
+.add-btn{margin-top:auto;width:100%;height:clamp(40px,5vw,48px);border:0;border-radius:clamp(10px,1.2vw,12px);cursor:pointer;background:#0f172a;color:#fff;font-size:clamp(14px,1.6vw,16px);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.sk{min-height:160px;border-radius:12px;background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 37%,#f1f5f9 63%);background-size:400% 100%;animation:s 1.2s ease infinite;}
+@keyframes s{0%{background-position:100% 50%}100%{background-position:0 50%}}
 
 /* =========================================
    Catalog header + view toggle
 ========================================= */
-.catalog-head{
+.catalog-page{padding-top:8px;}
+.catalog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 16px;}
+.catalog-title{margin:0;font-size:28px;font-weight:800;}
+.head-tools{display:flex;align-items:center;gap:10px;}
+.seg{display:inline-flex;background:#fff;border:1px solid #e5e7eb;padding:4px;border-radius:12px;gap:4px;}
+.seg-btn{padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;border:none;background:transparent;color:#0f172a;}
+.seg-btn.is-active{background:#0f172a;color:#fff;}
+
+/* =========================================
+   ROWS view (header + rows)  — з колонкою "Категорія"
+========================================= */
+.catalog-rows{display:grid;gap:8px;}
+/* 9 колонок: img | name | category | ₴/кг | ₴/шт | qty | grams | total | action */
+.row-head,.row-card{
+    display:grid;
+    grid-template-columns:
+    64px      /* фото */
+    1.4fr     /* назва */
+    0.9fr     /* категорія */
+    0.7fr     /* ₴/кг */
+    0.7fr     /* ₴/шт */
+    0.8fr     /* к-сть */
+    0.6fr     /* грам */
+    0.8fr     /* сума */
+    0.9fr;    /* дія */
+    align-items:center;gap:12px;
+}
+.row-head{
+    padding:6px 12px;margin:0 0 6px;background:#f8fafc;border:1px solid #eef2f4;border-radius:12px;
+    color:#6b7280;font-size:13px;font-weight:600;
+}
+.row-head .row-media{height:24px;}
+
+.row-card{
+    background:#fff;border:1px solid #eef2f4;border-radius:14px;padding:10px 12px;
+    transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.row-card.is-out{opacity:.6;}
+.catalog-rows .row-card:hover:not(.is-out){background:#f7fbff;border-color:#dbeaf6;box-shadow:0 4px 18px rgba(30,64,175,.10);}
+
+/* media */
+.row-media{width:64px;height:64px;display:grid;place-items:center;}
+.row-media img{width:48px;height:48px;object-fit:cover;border-radius:12px;background:#f3f4f6;}
+.row-ph{width:48px;height:48px;border-radius:12px;background:#f3f4f6;display:grid;place-items:center;font-size:22px;}
+
+/* text cells */
+.row-name{font-weight:600;line-height:1.2;}
+.row-sub{color:#6b7280;font-size:12px;margin-top:2px;}
+.row-col--category{color:#374151;}
+.row-col--pricekg,.row-col--pricepc,.row-col--grams,.row-col--total{text-align:right;}
+.row-col{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* qty controls (rows) — компактні */
+.row-col--qty .qty-controls{display:inline-flex;align-items:center;gap:6px;}
+.row-col--qty .qty-btn{width:28px;height:28px;padding:0;border-radius:8px;border:1px solid #d1d5db;background:#fff;line-height:26px;font-size:16px;transition:background-color .15s,border-color .15s,transform .06s;}
+.row-col--qty .qty-btn:hover:not(:disabled){background:#f1f5f9;border-color:#9ca3af;}
+.row-col--qty .qty-btn:active:not(:disabled){transform:translateY(1px);}
+.row-col--qty .qty-btn:disabled{opacity:.4;cursor:not-allowed;}
+.row-col--qty .qty-input{width:56px;height:28px;padding:0 8px;text-align:center;border:1px solid #d1d5db;border-radius:8px;background:#fff;font-size:14px;box-sizing:border-box;}
+.row-col--qty .qty-input::-webkit-outer-spin-button,.row-col--qty .qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.row-col--qty .qty-input[type="number"]{-moz-appearance:textfield;}
+
+/* action button (rows) */
+.row-col--act{justify-self:end;min-width:160px;}
+.row-col--act .add-btn{
+    position:relative;height:32px;width:100%;padding:0 14px;border-radius:10px;border:1px solid #0f172a;
+    background:#0f172a;color:#fff;font-weight:700;
+    transition:background-color .18s ease, transform .12s ease, box-shadow .18s ease, filter .18s ease;
+    overflow:hidden;
+}
+.row-col--act .add-btn:hover:not(:disabled){background:#1e293b;box-shadow:0 6px 18px rgba(15,23,42,.18);}
+.row-col--act .add-btn[disabled]{opacity:.5;cursor:not-allowed;}
+.na-label{display:inline-block;padding:6px 10px;border-radius:10px;background:#f3f4f6;color:#6b7280;font-weight:600;width:100%;text-align:center;}
+
+/* ripple при натисканні */
+.row-col--act .add-btn::after{
+    content:"";position:absolute;inset:50% auto auto 50%;width:10px;height:10px;background:rgba(255,255,255,.45);
+    border-radius:999px;transform:translate(-50%,-50%) scale(0);opacity:0;
+}
+.row-col--act .add-btn:active::after{opacity:1;transform:translate(-50%,-50%) scale(18);transition:transform .48s ease,opacity .48s ease;}
+
+
+/* КОЛЬОРОВІ СТАНИ (встановлює JS на 2с) */
+.row-col--act .add-btn.is-green{background:#16a34a;border-color:#16a34a;}
+.row-col--act .add-btn.is-green:hover{background:#15803d;}
+.row-col--act .add-btn.is-pink{background:#ec4899;border-color:#ec4899;}
+.row-col--act .add-btn.is-pink:hover{background:#db2777;}
+
+/* фокусна видимість */
+.row-card :is(.add-btn,.qty-btn,.qty-input):focus-visible{outline:2px solid #60a5fa;outline-offset:2px;}
+
+/* ---- Responsive: ховаємо менш важливі колонки ---- */
+@media (max-width:1100px){
+    .row-col--pricekg,.row-head .row-col--pricekg{display:none;}
+    .row-head,.row-card{
+        grid-template-columns:64px 1.4fr 0.9fr 0.7fr 0.8fr 0.6fr 0.8fr 0.9fr; /* без ₴/кг */
+    }
+}
+@media (max-width:900px){
+    .row-col--grams,.row-head .row-col--grams{display:none;}
+    .row-head,.row-card{
+        grid-template-columns:64px 1.4fr 0.9fr 0.7fr 0.8fr 0.8fr 0.9fr; /* без грам */
+    }
+}
+@media (max-width:740px){
+    .row-col--pricepc,.row-head .row-col--pricepc{display:none;}
+    .row-head,.row-card{
+        grid-template-columns:64px 1.4fr 0.9fr 0.8fr 0.8fr 0.9fr; /* без ₴/шт */
+    }
+}
+@media (max-width:620px){
+    .row-col--total,.row-head .row-col--total{display:none;}
+    .row-head,.row-card{
+        grid-template-columns:64px 1.4fr 0.9fr 0.8fr 0.9fr; /* без Сума */
+    }
+}
+
+/* ===== Catalog header layout ===== */
+.catalog-head--with-controls{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
-    margin:10px 0 16px;
 }
-.catalog-title{ margin:0; font-size:28px; font-weight:800; }
-.head-tools{ display:flex; align-items:center; gap:10px; }
-.seg{ display:inline-flex; background:#fff; border:1px solid #e5e7eb; padding:4px; border-radius:12px; gap:4px; }
-.seg-btn{ padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; border:none; background:transparent; color:#0f172a; }
-.seg-btn.is-active{ background:#0f172a; color:#fff; }
+.catalog-controls{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 
-/* =========================================
-   ROWS view (заголовок + рядки)
-========================================= */
-.catalog-rows{ display:flex; flex-direction:column; gap:10px; }
+/* ===== Sortbar (для карток) ===== */
+.sortbar{ display:flex; align-items:center; gap:8px; }
+.sortbar .seg{ padding:4px; border:1px solid #e5e7eb; border-radius:999px; background:#f3f4f6; }
+.sortbar .seg-btn{ padding:8px 14px; border-radius:999px; font-weight:700; }
+.sortbar .seg-btn.is-active{ background:#0f172a; color:#fff; }
 
-/* 9 колонок: img | name | ₴/кг | ₴/шт | qty | grams | total | avail | action */
-.row-card{
-    display:grid;
-    grid-template-columns: 56px 1fr 120px 120px 150px 100px 120px 90px 160px;
-    align-items:center; gap:12px;
-    padding:10px; background:#fff; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);
-}
-.row-card:hover{ box-shadow:0 2px 6px rgba(0,0,0,.06); }
-.row-media{
-    width:56px; height:56px; border-radius:10px; overflow:hidden;
-    background:#f6f7fb; display:grid; place-items:center; border:1px solid #e5e7eb;
-}
-.row-media img{ width:100%; height:100%; object-fit:cover; }
-.row-ph{ font-size:28px; opacity:.55; }
+.sortbar__arrow{ margin-left:6px; font-size:12px; opacity:.9; }
 
-.row-name{ font-weight:800; }
-.row-sub{ color:#6b7280; font-size:14px; display:flex; align-items:center; gap:6px; }
-.row-sub .dot{ opacity:.5; }
-
-.row-col{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.row-col--pricekg, .row-col--pricepc, .row-col--total{ text-align:right; font-variant-numeric:tabular-nums; }
-.row-col--avail{ text-align:center; }
-.row-col--act{ justify-self:end; min-width:160px; }
-
-/* header row (labels) */
-.row-head{ background:transparent; box-shadow:none; font-weight:700; padding:0 10px 6px; }
-.row-head .row-media{ visibility:hidden; }
-
-/* availability pill */
-.avail-pill{
+/* компактна кнопка-напрямок праворуч */
+.sortbar__dir{
+    height:36px; min-width:36px; padding:0 10px;
     display:inline-flex; align-items:center; justify-content:center;
-    padding:6px 12px; min-width:48px; height:28px; line-height:1;
-    border-radius:999px; font-size:13px; font-weight:800; letter-spacing:.01em;
+    border:1px solid #e5e7eb; border-radius:999px; background:#fff;
+    font-weight:700; cursor:pointer;
+    transition:background-color .2s,border-color .2s,transform .06s;
 }
-.avail-pill.ok  { background:#dcfce7; color:#166534; box-shadow: inset 0 0 0 1px #bbf7d0; }
-.avail-pill.bad { background:#fee2e2; color:#991b1b; box-shadow: inset 0 0 0 1px #fecaca; }
+.sortbar__dir:hover{ background:#f3f4f6; }
+.sortbar__dir:active{ transform:translateY(1px); }
 
-/* qty controls всередині рядка */
-.row-col--qty .qty-controls{
-    display:inline-flex; align-items:center; gap:6px;
+ /*(опц.) зробити шапку з сортуванням “липкою” під навбаром */
+/*!**/
+/*.catalog-head--with-controls{*/
+/*  position: sticky; top: 72px; z-index: 5;*/
+/*  background: #f8fafc; padding-block: 8px;*/
+/*}*/
+
+/* ===== Catalog header layout ===== */
+/*.catalog-head--with-controls{*/
+/*    position: sticky;*/
+/*    top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h) + 8px); !* 8px — повітря *!*/
+/*    z-index: 40;*/
+/*    background: #f8fafc;  !* підкласти фон, щоб контент не просвічував *!*/
+/*    padding-block: 8px;*/
+/*    border-bottom: 1px solid #e5e7eb;*/
+
+/*    display:flex; align-items:center; justify-content:space-between; gap:12px;*/
+/*}*/
+/*.catalog-controls{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }*/
+
+/*.catalog-head--with-controls{*/
+/*    position: sticky;*/
+/*    top: calc(var(--topbar-h, 72px) + env(safe-area-inset-top, 0px) + 8px);*/
+/*    z-index: 40;*/
+/*    background:#f8fafc;*/
+/*    padding-block:8px;*/
+/*    border-bottom:1px solid #e5e7eb;*/
+/*    display:flex; align-items:center; justify-content:space-between; gap:12px;*/
+/*}*/
+
+/* Header layout уже є. Додаємо пошук */
+.catalog-controls{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+
+/* Search box */
+.catalog-search{
+    position:relative; display:flex; align-items:center;
+    width:min(360px, 60vw);
 }
-.row-col--qty .qty-btn{ padding:6px 10px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; }
-.row-col--qty .qty-input{ width:60px; text-align:center; border:1px solid #e5e7eb; border-radius:10px; padding:6px 8px; }
-
-/* широка кнопка "Додати" в колонці дії */
-.row-col--act .add-btn{ width:100%; min-height:40px; justify-content:center; }
-
-/* поза наявністю — трохи приглушений ряд */
-.row-card.is-out{ box-shadow:0 1px 2px rgba(0,0,0,.04); }
-
-/* ---- Responsive: поступово прибираємо менш важливі колонки ---- */
-@media (max-width:1100px){
-    .row-col--pricekg, .row-head .row-col--pricekg{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 120px 150px 100px 120px 90px 160px; } /* – ₴/кг */
+.catalog-search .icon{
+    position:absolute; left:10px; width:16px; height:16px; opacity:.55;
 }
-@media (max-width:900px){
-    .row-col--grams, .row-head .row-col--grams{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 120px 150px 120px 90px 160px; }      /* – грам */
+.catalog-search__input{
+    width:100%; height:36px; padding:0 32px 0 34px;
+    border:1px solid #e5e7eb; border-radius:10px; background:#fff;
+    transition:border-color .12s, box-shadow .12s;
 }
-@media (max-width:740px){
-    .row-col--pricepc, .row-head .row-col--pricepc{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 150px 120px 90px 160px; }           /* – ₴/шт */
+.catalog-search__input:focus{
+    outline:none; border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,.22);
 }
-@media (max-width:620px){
-    .row-col--total, .row-head .row-col--total{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 150px 90px 160px; }                 /* – Сума */
+.catalog-search__clear{
+    position:absolute; right:6px; width:26px; height:26px; border-radius:8px;
+    border:1px solid #e5e7eb; background:#fff; cursor:pointer; line-height:1;
 }
+.catalog-search__clear:hover{ background:#f8fafc; }
 
-/* ---- Disabled states ---- */
-.add-btn[disabled], .qty-btn:disabled{
-    opacity:.55; cursor:not-allowed; filter:grayscale(0.1);
+/* ==== Add-to-cart micro FX (cards) ==== */
+.product-card .btn-add{
+    position: relative;
+    overflow: hidden;
+    transition: transform .06s, box-shadow .2s;
+    will-change: transform;
 }
-.qty-input:disabled{ opacity:.7; background:#f3f4f6; cursor:not-allowed; }
+.product-card .btn-add:active{ transform: translateY(1px); }
 
-/* =========================================
-   ROWS view (заголовок + рядки) — БЕЗ "Наявність"
-========================================= */
-.catalog-rows{ display:flex; flex-direction:column; gap:10px; }
-
-/* 8 колонок: img | name | ₴/кг | ₴/шт | qty | grams | total | action */
-.row-card{
-    display:grid;
-    grid-template-columns: 56px 1fr 120px 120px 150px 100px 120px 160px; /* без avail */
-    align-items:center; gap:12px;
-    padding:10px; background:#fff; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);
+/* pop */
+.product-card .btn-add.is-pop{
+    animation: btn-pop .34s cubic-bezier(.2,.7,.3,1.2);
 }
-.row-card:hover{ box-shadow:0 2px 6px rgba(0,0,0,.06); }
-
-.row-media{
-    width:56px; height:56px; border-radius:10px; overflow:hidden;
-    background:#f6f7fb; display:grid; place-items:center; border:1px solid #e5e7eb;
-}
-.row-media img{ width:100%; height:100%; object-fit:cover; }
-.row-ph{ font-size:28px; opacity:.55; }
-
-.row-name{ font-weight:800; }
-.row-sub{ color:#6b7280; font-size:14px; display:flex; align-items:center; gap:6px; }
-.row-sub .dot{ opacity:.5; }
-
-.row-col{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.row-col--pricekg, .row-col--pricepc, .row-col--total{ text-align:right; font-variant-numeric:tabular-nums; }
-.row-col--act{ justify-self:end; min-width:160px; }
-
-/* header row (labels) */
-.row-head{ background:transparent; box-shadow:none; font-weight:700; padding:0 10px 6px; }
-.row-head .row-media{ visibility:hidden; }
-
-/* кнопка/лейбл дії */
-.row-col--act .add-btn{ width:100%; min-height:40px; justify-content:center; }
-
-/* текстова заглушка коли товару немає */
-.na-label{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:100%; min-height:40px; border-radius:12px;
-    background:#f3f4f6; color:#6b7280; font-weight:800;
+@keyframes btn-pop{
+    0%{ transform: translateY(0) scale(1); }
+    40%{ transform: translateY(-1px) scale(1.04); }
+    100%{ transform: translateY(0) scale(1); }
 }
 
-/* поза наявністю — трохи приглушений ряд */
-.row-card.is-out{ box-shadow:0 1px 2px rgba(0,0,0,.04); }
-
-/* ---- Responsive: поступово прибираємо менш важливі колонки ---- */
-@media (max-width:1100px){
-    .row-col--pricekg, .row-head .row-col--pricekg{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 120px 150px 100px 120px 160px; } /* – ₴/кг */
+/* ripple from click point */
+.product-card .btn-add.is-ink::after{
+    content:"";
+    position:absolute; pointer-events:none;
+    left: var(--ink-x, 50%); top: var(--ink-y, 50%);
+    width: 16px; height: 16px; border-radius: 999px;
+    background: rgba(255,255,255,.6);
+    transform: translate(-50%,-50%) scale(0);
+    animation: btn-ink .45s ease-out forwards;
+    mix-blend-mode: screen;
 }
-@media (max-width:900px){
-    .row-col--grams, .row-head .row-col--grams{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 120px 150px 120px 160px; }      /* – грам */
-}
-@media (max-width:740px){
-    .row-col--pricepc, .row-head .row-col--pricepc{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 150px 120px 160px; }           /* – ₴/шт */
-}
-@media (max-width:620px){
-    .row-col--total, .row-head .row-col--total{ display:none; }
-    .row-card{ grid-template-columns: 56px 1fr 150px 160px; }                 /* – Сума */
+@keyframes btn-ink{
+    to{ transform: translate(-50%,-50%) scale(18); opacity:0; }
 }
 
-/* ---- Disabled states ---- */
-.add-btn[disabled], .qty-btn:disabled{
-    opacity:.55; cursor:not-allowed; filter:grayscale(0.1);
+/* Плавні переходи для кольорів кнопки */
+.product-card .btn-add{
+    transition:
+            background-color .25s ease,
+            color .25s ease,
+            border-color .25s ease,
+            box-shadow .25s ease,
+            transform .06s ease;
 }
-.qty-input:disabled{ opacity:.7; background:#f3f4f6; cursor:not-allowed; }
 
-/* 👇 можна видалити старі стилі “Наявність” якщо більше не потрібні:
-   .row-col--avail {…} .avail-pill {…}
-*/
+/* Зелений стан (успішно додано) на ~1с */
+.product-card .btn-add.is-success{
+    background: linear-gradient(180deg,#22c55e 0%,#16a34a 100%);
+    color:#fff;
+    border-color:#16a34a;
+    box-shadow: 0 6px 16px rgba(22,163,74,.25);
+}
+.product-card .btn-add.is-success:hover{
+    background: linear-gradient(180deg,#16c05a 0%,#15803d 100%);
+}
+.product-card .btn-add:disabled{
+    opacity:.6; cursor:not-allowed; box-shadow:none;
+}

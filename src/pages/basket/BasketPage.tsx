@@ -195,9 +195,9 @@ const BasketPage = () => {
                 <form className="summary-form" onSubmit={handleSubmit}>
                     <ul className="summary-list">
                         <li><span>Кількість пакунків:</span><b>{packTotals.totalPacks}</b></li>
-                        <li><span>Ціна наповнення (за 1):</span><b>{formatUAH(packTotals.perPack.fillKop)}</b></li>
-                        <li><span>Цукерки × {packTotals.totalPacks}:</span><b>{formatUAH(packTotals.allPacks.itemsCostAllPacksKop)}</b></li>
-                        <li><span>Пакування:</span><b>{formatUAH(packTotals.allPacks.packagingCostKop)}</b></li>
+                        <li><span>Ціна цукерок за 1 пакунок:</span><b>{formatUAH(packTotals.perPack.fillKop)}</b></li>
+                        <li><span>Ціна цукерок за  {packTotals.totalPacks} пакунків:</span><b>{formatUAH(packTotals.allPacks.itemsCostAllPacksKop)}</b></li>
+                        <li><span>Ціна за упаковки:</span><b>{formatUAH(packTotals.allPacks.packagingCostKop)}</b></li>
                         <li><span>Вага одного пакунка:</span><b>{totalWeightG} г</b></li>
                         <li><span>Загальна вага:</span><b>{packTotals.allPacks.totalWeightG} г</b></li>
 

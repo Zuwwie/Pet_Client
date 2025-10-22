@@ -3,10 +3,10 @@ import type { ICandy } from "../models/ICandy";
 import type { IPackaging } from "../models/IPackaging";
 
 /* -------------------- keys & events -------------------- */
-const KEY = "cart:v1";                     // цукерки (fill)
-const PACK_SEL_KEY = "cart:packaging";     // [legacy] одне вибране пакування
-const PACK_COUNT_KEY = "cart:packaging:count"; // [legacy] лічильник пакунків
-const PACK_CART_KEY = "pack:cart:v1";      // новий кошик пакувань (масив з qty)
+const KEY = "cart:v1";                        // цукерки (fill)
+const PACK_SEL_KEY = "cart:packaging";        // [legacy] одне вибране пакування
+const PACK_COUNT_KEY = "cart:packaging:count";// [legacy] лічильник пакунків
+const PACK_CART_KEY = "pack:cart:v1";         // новий кошик пакувань (масив з qty)
 const CART_EVENT = "cart:updated";
 
 /* -------------------- money helpers -------------------- */
@@ -38,29 +38,37 @@ export type PackCartItem = {
     capacityG?: number;
 };
 
-/* -------------------- utils -------------------- */
-const notifyCart = () => {
+/* -------------------- utils (safe storage + notify) -------------------- */
+const canUseLS = () => typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+
+const notifyCart = (): void => {
     if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent(CART_EVENT));
     }
 };
 
 const readJSON = <T,>(key: string, fallback: T): T => {
+    if (!canUseLS()) return fallback;
     try {
-        const raw = localStorage.getItem(key);
+        const raw = window.localStorage.getItem(key);
         return raw ? (JSON.parse(raw) as T) : fallback;
     } catch {
         return fallback;
     }
 };
 
-const writeJSON = (key: string, value: any) => {
-    localStorage.setItem(key, JSON.stringify(value));
+const writeJSON = (key: string, value: unknown): void => {
+    if (!canUseLS()) return;
+    try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+        // ignore quota/serialization errors
+    }
     notifyCart();
 };
 
 /* -------------------- price helpers -------------------- */
-const piecePriceKop = (c: ICandy) => {
+const piecePriceKop = (c: ICandy): number => {
     const pcsPrice = (c as any).pricePerPcsSell;
     if (typeof pcsPrice === "number") return toKop(pcsPrice);
 
@@ -73,7 +81,7 @@ const piecePriceKop = (c: ICandy) => {
 export const onCartChange = (cb: () => void) => {
     const h = () => cb();
     const storageH = (e: StorageEvent) => {
-        if ([KEY, PACK_SEL_KEY, PACK_COUNT_KEY, PACK_CART_KEY].includes(e.key || "")) cb();
+        if ([KEY, PACK_SEL_KEY, PACK_COUNT_KEY, PACK_CART_KEY].includes(e.key ?? "")) cb();
     };
 
     if (typeof window !== "undefined") {
@@ -94,23 +102,32 @@ export const onCartChange = (cb: () => void) => {
    ========================================================= */
 const readFill = (): CartItem[] => readJSON<CartItem[]>(KEY, []);
 
-export const getCart = () => readFill();
-export const clearCart = () => writeJSON(KEY, []);
+export const getCart = (): CartItem[] => readFill();
 
-export const addToCart = (candy: ICandy, qty = 1) => {
+export const clearCart = (): void => writeJSON(KEY, []);
+
+export const addToCart = (candy: ICandy, qty = 1): void => {
     const items = readFill();
-    const id = (candy as any)._id ?? (candy as any).id ?? String((candy as any).name);
-    const idx = items.findIndex((i) => i.id === id);
+    const id =
+        (candy as any)._id ??
+        (candy as any).id ??
+        String((candy as any).name);
+    const idStr = String(id);
+
+    const idx = items.findIndex((i) => i.id === idStr);
 
     const base: Omit<CartItem, "qty"> = {
-        id: String(id),
+        id: idStr,
         name: (candy as any).name,
         photoUrl:
             (candy as any).photoUrl ??
             (candy as any).imageUrl ??
             (candy as any).photo ??
             (candy as any).img,
-        weightPerPieceG: (candy as any).weightPerPiece ?? (candy as any).weightPerPieceG ?? 0,
+        weightPerPieceG:
+            (candy as any).weightPerPiece ??
+            (candy as any).weightPerPieceG ??
+            0,
         piecePriceKop: piecePriceKop(candy),
     };
 
@@ -121,7 +138,7 @@ export const addToCart = (candy: ICandy, qty = 1) => {
     writeJSON(KEY, items);
 };
 
-export const setQty = (id: string, qty: number) => {
+export const setQty = (id: string, qty: number): void => {
     const n = Math.max(1, Math.floor(qty) || 1);
     writeJSON(
         KEY,
@@ -129,11 +146,29 @@ export const setQty = (id: string, qty: number) => {
     );
 };
 
-export const removeFromCart = (id: string) =>
+export const removeFromCart = (id: string): void =>
     writeJSON(
         KEY,
         readFill().filter((i) => i.id !== id)
     );
+
+// 👇 зручні інкременти/декременти
+export const incInCart = (id: string, delta = 1): void => {
+    const n = Math.max(1, Math.floor(delta) || 1);
+    const items = readFill();
+    const i = items.findIndex((x) => x.id === id);
+    if (i === -1) return;
+    items[i].qty += n;
+    writeJSON(KEY, items);
+};
+
+export const decFromCart = (id: string, delta = 1): void => {
+    const n = Math.max(1, Math.floor(delta) || 1);
+    const items = readFill().map((x) =>
+        x.id === id ? { ...x, qty: x.qty - n } : x
+    ).filter((x) => x.qty > 0);
+    writeJSON(KEY, items);
+};
 
 export const getTotals = () => {
     const items = readFill();
@@ -145,38 +180,42 @@ export const getTotals = () => {
 
 /* =========================================================
    [LEGACY] SINGLE SELECTED PACKAGING + COUNT
-   (можеш не використовувати; лишено для сумісності)
+   (залишено для сумісності; можна не використовувати)
    ========================================================= */
-export const getPackaging = (): IPackaging | null => readJSON<IPackaging | null>(PACK_SEL_KEY, null);
+export const getPackaging = (): IPackaging | null =>
+    readJSON<IPackaging | null>(PACK_SEL_KEY, null);
 
-export const setPackaging = (p: IPackaging | null) => {
+export const setPackaging = (p: IPackaging | null): void => {
     if (p) writeJSON(PACK_SEL_KEY, p);
     else {
-        localStorage.removeItem(PACK_SEL_KEY);
+        if (canUseLS()) window.localStorage.removeItem(PACK_SEL_KEY);
         notifyCart();
     }
 };
 
-export const getPackagingKop = () => getPackaging()?.priceKop ?? 0;
+export const getPackagingKop = (): number =>
+    getPackaging()?.priceKop ?? 0;
 
 export const getPackagesCount = (): number => {
     const n = readJSON<number>(PACK_COUNT_KEY, 1);
     return Math.max(1, Math.floor(n) || 1);
 };
 
-export const setPackagesCount = (count: number) => {
+export const setPackagesCount = (count: number): void => {
     const n = Math.max(1, Math.floor(count) || 1);
     writeJSON(PACK_COUNT_KEY, n);
 };
 
-export const incPackagesCount = () => setPackagesCount(getPackagesCount() + 1);
-export const decPackagesCount = () => setPackagesCount(Math.max(1, getPackagesCount() - 1));
+export const incPackagesCount = (): void =>
+    setPackagesCount(getPackagesCount() + 1);
 
-// ціна одного пакунка (fill + одне вибране пакування)
-export const getPricePerPackageKop = () => getTotals().subtotalKop + getPackagingKop();
+export const decPackagesCount = (): void =>
+    setPackagesCount(Math.max(1, getPackagesCount() - 1));
 
-// загальна сума для legacy-моделі
-export const calcGrandTotalKop = (packagesCount?: number) => {
+export const getPricePerPackageKop = (): number =>
+    getTotals().subtotalKop + getPackagingKop();
+
+export const calcGrandTotalKop = (packagesCount?: number): number => {
     const count = packagesCount ?? getPackagesCount();
     return getPricePerPackageKop() * Math.max(1, Math.floor(count) || 1);
 };
@@ -203,20 +242,24 @@ export const getGrandTotals = () => {
    NEW: MULTI PACKAGING CART (масив пакувань з qty)
    Використовуй це на сторінці пакувань зі степпером.
    ========================================================= */
-export const getPackCart = (): PackCartItem[] => readJSON<PackCartItem[]>(PACK_CART_KEY, []);
-export const clearPackCart = () => writeJSON(PACK_CART_KEY, []);
+export const getPackCart = (): PackCartItem[] =>
+    readJSON<PackCartItem[]>(PACK_CART_KEY, []);
 
-export const getPackQty = (packagingId: string) =>
+export const clearPackCart = (): void => writeJSON(PACK_CART_KEY, []);
+
+export const getPackQty = (packagingId: string): number =>
     getPackCart().find((x) => x.packagingId === packagingId)?.qty ?? 0;
 
-export function addPack(p: IPackaging, qty = 1) {
+export function addPack(p: IPackaging, qty = 1): void {
     const n = Math.max(1, Math.floor(qty) || 1);
     const cart = getPackCart();
-    const id = String((p as any).id ?? (p as any)._id ?? p.name);
+    const id =
+        String((p as any).id ?? (p as any)._id ?? p.name);
     const i = cart.findIndex((x) => x.packagingId === id);
 
-    if (i >= 0) cart[i].qty += n;
-    else
+    if (i >= 0) {
+        cart[i].qty += n;
+    } else {
         cart.push({
             packagingId: id,
             title: p.name,
@@ -225,11 +268,12 @@ export function addPack(p: IPackaging, qty = 1) {
             imageUrl: (p as any).imageUrl,
             capacityG: p.capacityG,
         });
+    }
 
     writeJSON(PACK_CART_KEY, cart);
 }
 
-export function setPackQty(packagingId: string, qty: number) {
+export function setPackQty(packagingId: string, qty: number): void {
     const n = Math.max(0, Math.floor(qty) || 0);
     const cart = getPackCart()
         .map((x) => (x.packagingId === packagingId ? { ...x, qty: n } : x))
@@ -238,17 +282,36 @@ export function setPackQty(packagingId: string, qty: number) {
     writeJSON(PACK_CART_KEY, cart);
 }
 
-export function removePack(packagingId: string) {
+export function removePack(packagingId: string): void {
     writeJSON(
         PACK_CART_KEY,
         getPackCart().filter((x) => x.packagingId !== packagingId)
     );
 }
 
-export const getTotalPacksCount = () => getPackCart().reduce((s, x) => s + x.qty, 0);
+// 👇 зручні інкременти/декременти для пакунків
+export function incPack(packagingId: string, delta = 1): void {
+    const n = Math.max(1, Math.floor(delta) || 1);
+    const cart = getPackCart();
+    const i = cart.findIndex((x) => x.packagingId === packagingId);
+    if (i === -1) return;
+    cart[i].qty += n;
+    writeJSON(PACK_CART_KEY, cart);
+}
 
-/* Підсумки для multi-pack кошика:
-   сума = (ціна НАПОВНЕННЯ × сума qty усіх пакунків) + (сума цін пакувань × їх qty) */
+export function decPack(packagingId: string, delta = 1): void {
+    const n = Math.max(1, Math.floor(delta) || 1);
+    const cart = getPackCart()
+        .map((x) => (x.packagingId === packagingId ? { ...x, qty: x.qty - n } : x))
+        .filter((x) => x.qty > 0);
+    writeJSON(PACK_CART_KEY, cart);
+}
+
+export const getTotalPacksCount = (): number =>
+    getPackCart().reduce((s, x) => s + x.qty, 0);
+
+// Підсумки для multi-pack кошика:
+// сума = (ціна НАПОВНЕННЯ × сума qty усіх пакунків) + (сума цін пакувань × їх qty)
 export function getGrandTotalsPacks() {
     const fill = getTotals();
     const totalPacks = getTotalPacksCount();
@@ -268,3 +331,46 @@ export function getGrandTotalsPacks() {
         },
     };
 }
+
+/* =========================================================
+   Допоміжне: почистити все / міграція legacy → multi-pack
+   ========================================================= */
+export const clearAllCarts = (): void => {
+    if (canUseLS()) {
+        window.localStorage.removeItem(KEY);
+        window.localStorage.removeItem(PACK_SEL_KEY);
+        window.localStorage.removeItem(PACK_COUNT_KEY);
+        window.localStorage.removeItem(PACK_CART_KEY);
+    }
+    notifyCart();
+};
+
+// Перетворити legacy-вибір пакування у новий кошик (1 шт)
+export const migrateLegacyPackagingToPackCart = (): void => {
+    const legacy = getPackaging();
+    const count = getPackagesCount();
+    if (!legacy || count <= 0) return;
+
+    const cur = getPackCart();
+    const id = String((legacy as any).id ?? (legacy as any)._id ?? legacy.name);
+    const i = cur.findIndex((x) => x.packagingId === id);
+    if (i >= 0) cur[i].qty += count;
+    else
+        cur.push({
+            packagingId: id,
+            title: legacy.name,
+            priceKop: legacy.priceKop,
+            qty: count,
+            imageUrl: (legacy as any).imageUrl,
+            capacityG: legacy.capacityG,
+        });
+
+    writeJSON(PACK_CART_KEY, cur);
+
+    // очистити legacy
+    if (canUseLS()) {
+        window.localStorage.removeItem(PACK_SEL_KEY);
+        window.localStorage.removeItem(PACK_COUNT_KEY);
+    }
+    notifyCart();
+};

@@ -1,0 +1,267 @@
+/* ===== Packaging Admin (scoped) ===== */
+.admin-pack { padding: 12px; box-sizing: border-box; }
+
+.admin-pack .title { margin: 0 0 8px; font-weight: 800; font-size: 22px; }
+.admin-pack .tools { display:flex; gap:8px; align-items:center; }
+
+.admin-pack .inp{
+    height:34px; padding:0 10px;
+    border:1px solid #e5e7eb; border-radius:8px; background:#fff;
+    transition:border-color .12s, box-shadow .12s;
+}
+.admin-pack .inp:focus{
+    outline:none; border-color:#38bdf8;
+    box-shadow:0 0 0 3px rgba(56,189,248,.25);
+}
+.admin-pack .inp.mono { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; }
+
+.admin-pack .btn{
+    height:34px; padding:0 12px; border-radius:8px;
+    border:1px solid #cbd5e1; background:#fff; cursor:pointer;
+    transition:transform .12s, background .12s, border-color .12s, box-shadow .12s;
+}
+.admin-pack .btn:hover{ background:#f8fafc; transform:translateY(-1px); }
+.admin-pack .btn:active{ transform:translateY(0); }
+.admin-pack .btn.solid{ background:#0f172a; color:#fff; border-color:#0f172a; }
+.admin-pack .btn.solid:hover{ box-shadow:0 6px 18px rgba(2,6,23,.25); }
+.admin-pack .btn.ghost{ background:transparent; }
+.admin-pack .btn.danger{ border-color:#ef4444; color:#b91c1c; background:#fff; }
+.admin-pack .btn.danger:hover{ background:#fee2e2; }
+
+.admin-pack .muted { color:#64748b; }
+.admin-pack .error { color:#b91c1c; white-space:pre-wrap; }
+.admin-pack .pad { padding:12px; }
+
+/* ===== таблиця (8 колонок): Фото | Назва | ₴ куп. | ₴ прод. | Вміст, г | Ключ | Наявність | Дії ===== */
+.admin-pack .tbl{
+    display:grid; gap:8px; margin-top:10px; width:100%;
+    --cols:
+            64px                               /* Фото */
+            minmax(260px, 2fr)                 /* Назва */
+            minmax(110px, .9fr)                /* ₴ куп. */
+            minmax(110px, .9fr)                /* ₴ прод. */
+            minmax(110px, .9fr)                /* Вміст, г */
+            minmax(140px, 1fr)                 /* Ключ */
+            minmax(110px, .7fr)                /* Наявність */
+            minmax(200px, 1.1fr);              /* Дії */
+}
+
+.admin-pack .tbl-head,
+.admin-pack .tbl-row{
+    display:grid; align-items:center; gap:10px;
+    grid-template-columns: var(--cols);
+    padding:8px; box-sizing:border-box;
+}
+
+.admin-pack .tbl-head{ color:#6b7280; font-weight:700; font-size:13px; }
+.admin-pack .tbl-head > div:last-child{ justify-self:end; }
+
+.admin-pack .tbl-row{
+    background:#fff; border:1px solid #eef2f4; border-radius:10px;
+    transition: border-color .15s, box-shadow .15s, transform .15s, background-color .15s;
+}
+/* Hover-ефект (як просив — блакитний) */
+.admin-pack .tbl-row:hover{
+    border-color: rgba(102,184,253,.63);
+    background: #abc5fa;
+    box-shadow:0 6px 18px rgba(2,6,23,.06), 0 2px 6px rgba(2,6,23,.05);
+    transform:translateY(-1px);
+}
+
+/* Комірки */
+.admin-pack .cell{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.admin-pack .cell.num{ text-align:right; font-variant-numeric: tabular-nums; }
+.admin-pack .cell.mono{ font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:#334155; }
+
+.admin-pack .cell.media{ display:grid; place-items:center; }
+.admin-pack .cell.media img{ width:48px; height:48px; object-fit:cover; border-radius:8px; background:#f3f4f6; }
+.admin-pack .cell.media .ph{ width:48px; height:48px; display:grid; place-items:center; background:#f3f4f6; border-radius:8px; }
+
+.admin-pack .cell.name .n{ font-weight:700; }
+.admin-pack .cell.name .sub{ color:#94a3b8; font-size:12px; }
+
+/* Дії — не обрізати кнопки */
+.admin-pack .cell.act{ overflow:visible; display:flex; justify-content:flex-end; gap:8px; }
+.admin-pack .cell.act .btn { white-space:nowrap; }
+
+/* ---- responsive ---- */
+@media (max-width:1180px){
+    .admin-pack .tbl{ --cols:
+            64px minmax(220px,2fr) minmax(100px,.9fr) minmax(100px,.9fr)
+            minmax(100px,.9fr) minmax(140px,1fr) minmax(100px,.7fr) minmax(170px,1.1fr); }
+}
+
+/* На вузьких ховаємо "Ключ" (6-та колонка) */
+@media (max-width:1020px){
+    .admin-pack .tbl{ --cols:
+            64px minmax(220px,2fr) minmax(100px,.9fr) minmax(100px,.9fr)
+            minmax(100px,.9fr)       /* Вміст, г */
+            minmax(100px,.7fr)       /* Наявність */
+            minmax(170px,1.1fr);     /* Дії */
+    }
+    .admin-pack .tbl-head > :nth-child(6),
+    .admin-pack .tbl-row  > :nth-child(6){ display:none; } /* ховаємо саме 6-ту — "Ключ" */
+}
+
+/* ===== Switch ===== */
+.admin-pack .switch{
+    position:relative;
+    display:inline-block;
+    width:44px;
+    height:24px;
+}
+.admin-pack .switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+.admin-pack .switch span{
+    position:absolute;
+    inset:0;
+    background:#fee2e2;
+    border:1px solid #fecaca;
+    border-radius:999px;
+    transition:background .2s, border-color .2s;
+    cursor: pointer;
+}
+.admin-pack .switch span::before{
+    content:"";
+    position:absolute;
+    top:2px;
+    left:2px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#fca5a5;
+    transition:transform .2s ease, background .2s;
+    box-shadow:0 1px 2px rgba(0,0,0,.15);
+}
+.admin-pack .switch input:checked + span{
+    background:#dcfce7;
+    border-color:#bbf7d0;
+}
+.admin-pack .switch input:checked + span::before{
+    transform:translateX(20px);
+    background:#86efac;
+}
+.admin-pack .switch input:disabled + span{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+/* ===== Modal (isolated, full-feature) ===== */
+body.modal-open{ overflow:hidden; overscroll-behavior:contain; }
+
+.pack-modal{
+    position:fixed; inset:0; z-index:4000;
+    display:grid; place-items:center; padding:20px;
+    background:rgba(15,23,42,.45);
+    backdrop-filter:saturate(110%) blur(3px);
+    animation:pm-overlay .15s ease-out;
+}
+.pack-modal__card{
+    width:min(920px,96vw);
+    max-height:min(88vh,1100px);
+    display:grid; grid-template-rows:auto 1fr auto;
+    background:#fff; border:1px solid #e5e7eb; border-radius:16px;
+    box-shadow:0 18px 60px rgba(2,6,23,.18), 0 8px 24px rgba(2,6,23,.12);
+    overflow:hidden;
+    animation:pm-pop .18s cubic-bezier(.2,.7,.2,1);
+}
+.pack-modal__top{
+    position:sticky; top:0; z-index:1;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 16px;
+    background:linear-gradient(#fff,#fafafa);
+    border-bottom:1px solid #eef2f6;
+}
+.pack-modal__title{ margin:0; font:800 18px/1.25 system-ui; letter-spacing:.2px; }
+.pack-modal__body{ overflow:auto; padding:14px 16px 10px 16px; }
+.pack-modal__actions{
+    position:sticky; bottom:0; z-index:1;
+    display:flex; justify-content:flex-end; gap:8px;
+    padding:12px 16px; background:linear-gradient(#fafafa,#fff);
+    border-top:1px solid #eef2f6;
+}
+
+/* Close button used in TSX: .btn-x */
+.btn-x{
+    display:grid; place-items:center;
+    width:34px; height:34px; border-radius:10px;
+    border:1px solid #e5e7eb; background:#fff; cursor:pointer;
+    transition:transform .12s, background .12s, border-color .12s;
+}
+.btn-x:hover{ background:#f8fafc; border-color:#dbe1e8; transform:translateY(-1px); }
+.btn-x:active{ transform:translateY(0); }
+
+/* Form grid inside modal */
+.pack-form .grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.pack-form .lbl{ display:flex; flex-direction:column; gap:6px; }
+@media (max-width:720px){
+    .pack-modal{ padding:0; }
+    .pack-modal__card{ width:100vw; height:100vh; max-height:100vh; border-radius:0; }
+    .pack-modal__body{ padding:14px; }
+    .pack-form .grid{ grid-template-columns:1fr; }
+}
+
+/* Optional: force fullscreen on desktop */
+.pack-modal--fullscreen .pack-modal__card{
+    width:100vw; height:100vh; max-height:100vh; border-radius:0;
+}
+
+/* Animations */
+@keyframes pm-overlay{ from{ background:rgba(15,23,42,0);} to{ background:rgba(15,23,42,.45);} }
+@keyframes pm-pop{
+    from{ transform:translateY(12px) scale(.98); opacity:0; }
+    to{   transform:translateY(0)    scale(1);    opacity:1; }
+}
+@media (prefers-reduced-motion:reduce){
+    .pack-modal,.pack-modal__card{ animation:none !important; }
+}
+
+/* ===== Switch ===== */
+.admin-pack .switch{
+    position:relative;
+    display:inline-block;
+    width:44px;
+    height:24px;
+}
+.admin-pack .switch input{
+    opacity:0;
+    width:0;
+    height:0;
+}
+.admin-pack .switch span{
+    position:absolute;
+    inset:0;
+    background:#fee2e2;
+    border:1px solid #fecaca;
+    border-radius:999px;
+    transition:background .2s, border-color .2s;
+    cursor: pointer;
+}
+.admin-pack .switch span::before{
+    content:"";
+    position:absolute;
+    top:50%; /* ЗМІНА: центрування по вертикалі */
+    left:2px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#fca5a5;
+    transition:transform .2s ease, background .2s;
+    box-shadow:0 1px 2px rgba(0,0,0,.15);
+    transform: translateY(-50%); /* ЗМІНА: центрування по вертикалі */
+}
+.admin-pack .switch input:checked + span{
+    background:#dcfce7;
+    border-color:#bbf7d0;
+}
+.admin-pack .switch input:checked + span::before{
+    transform:translateX(20px) translateY(-50%); /* ЗМІНА: додано translateY */
+    background:#86efac;
+}
+.admin-pack .switch input:disabled + span{
+    opacity:.5;
+    cursor:not-allowed;
+}

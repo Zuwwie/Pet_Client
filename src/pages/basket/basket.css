@@ -527,3 +527,104 @@ body {
 .packcart-item .qty-input{ width:72px; text-align:center; }
 
 
+/* ===== subtle hovers in basket ===== */
+
+/* картки: пакування + цукерки */
+.packcart-item,
+.basket-item{
+    transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease, background-color .18s ease;
+}
+.packcart-item:hover,
+.basket-item:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15,23,42,.08);
+}
+
+/* медіа всередині: легкий зум */
+.packcart-media img,
+.basket-media img{
+    transition: transform .18s ease, opacity .18s ease;
+}
+.packcart-item:hover .packcart-media img,
+.basket-item:hover .basket-media img{
+    transform: scale(1.02);
+}
+
+/* рамка медіа при наведенні */
+.packcart-item:hover .packcart-media,
+.basket-item:hover .basket-media{
+    background:#f3f4f6;
+    border-color:#d1d5db;
+}
+
+/* кнопки +/- та інші */
+.qty-btn{
+    transition: background-color .15s ease, box-shadow .15s ease, transform .08s ease;
+}
+.qty-btn:hover{
+    background:#f3f4f6;
+    box-shadow: 0 0 0 1px #e5e7eb inset;
+}
+.qty-btn:active{ transform: scale(.96); }
+
+/* кнопка видалення */
+.danger-btn{
+    transition: color .15s ease, background-color .15s ease, transform .08s ease, opacity .15s ease;
+}
+.danger-btn:hover{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+.danger-btn:active{ transform: scale(.96); }
+
+/* велика кнопка оформлення / додавання (якщо є .add-btn / .summary-submit) */
+.add-btn,
+.summary-submit{
+    transition: background-color .15s ease, transform .08s ease, box-shadow .15s ease;
+}
+.add-btn:hover,
+.summary-submit:hover{
+    background:#111827; /* трохи світліше за #0f172a */
+    box-shadow: 0 4px 12px rgba(15,23,42,.15);
+}
+.add-btn:active,
+.summary-submit:active{ transform: translateY(1px); }
+
+/* фокус для клавіатури */
+.qty-input:focus,
+.summary-input:focus,
+.summary-textarea:focus{
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.25); /* м’яке підсвічування */
+    border-color:#93c5fd;
+}
+
+/* повага до reduce motion */
+@media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+}
+/* ===== Hover underline in summary ===== */
+.summary-list li{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 0;
+}
+
+.summary-list li:hover span,
+.summary-list li:hover b{
+    text-decoration: underline;
+    text-decoration-color: #9ca3af;   /* сіре підкреслення */
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+/* (опційно) не підкреслювати фінальний рядок Разом */
+.summary-list li.summary-total:hover span,
+.summary-list li.summary-total:hover b{
+    text-decoration: none;
+}
+
+/* (альтернатива, якщо хочеш лінію під усім рядком)
+.summary-list li:hover{
+  border-bottom: 1px solid #d1d5db;
+}
+*/

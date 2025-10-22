@@ -104,6 +104,7 @@
     padding: 12px;
     box-shadow: 0 0 0 1px #e5e7eb inset, 0 1px 2px rgba(15, 23, 42, .04);
     cursor: pointer;
+    position: relative;
 }
 
 .pack-card:hover {
@@ -126,6 +127,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 .pack-media img {
@@ -179,7 +181,7 @@
     width: 100%;
 }
 
-/* Міні-прев’ю у кошику (як було) */
+/* Міні-прев'ю у кошику (як було) */
 .pack-thumb {
     width: 56px;
     height: 56px;
@@ -409,3 +411,455 @@
     font-weight: 800;
     color: #0f172a;
 }
+
+/* плавний ефект і зелений стан на 2с */
+.pack-btn {
+    transition: background-color .18s ease, box-shadow .18s ease, transform .12s ease, border-color .18s ease, color .18s ease;
+}
+
+.pack-btn.is-green {
+    background: #16a34a; /* emerald-600 */
+    border-color: #16a34a;
+    color: #fff;
+}
+
+.pack-btn.is-green:hover {
+    background: #15803d; /* emerald-700 */
+}
+
+/* packaging.css (додай) */
+.pack-inline {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn.danger {
+    background: #b91c1c;
+    border-color: #b91c1c;
+    color: #fff;
+}
+
+.btn.danger.ghost {
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #b91c1c;
+}
+
+.btn.danger.ghost:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* контейнер ліворуч бейдж, праворуч кнопка */
+.pack-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* красивий зеленуватий бейдж */
+.in-cart-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 12px;
+    background: #ecfdf5; /* emerald-50 */
+    border: 1px solid #a7f3d0; /* emerald-200 */
+    color: #065f46; /* emerald-900 */
+    font-weight: 700;
+    line-height: 1;
+}
+
+.in-cart-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981; /* emerald-500 */
+    box-shadow: 0 0 0 2px #d1fae5 inset; /* emerald-100 */
+}
+
+.in-cart-label {
+    opacity: .9;
+}
+
+.in-cart-count {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #a7f3d0;
+    font-variant-numeric: tabular-nums;
+}
+
+/* щоб кнопка "Видалити" була однієї висоти з бейджем */
+.pack-remove {
+    height: 32px;
+}
+
+/* на вузьких екранах лишимо тільки число */
+@media (max-width: 420px) {
+    .in-cart-label {
+        display: none;
+    }
+}
+
+/* Заголовок-«кнопка» */
+.th {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 4px 2px;
+    border-radius: 6px;
+    font: 700 15px/1.1 system-ui;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.th:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px
+}
+
+/* НІЧОГО не показуємо за замовчуванням */
+.th::after {
+    content: none
+}
+
+/* Малюємо стрілки тільки коли колонка активна */
+.th[data-dir="asc"]::after {
+    content: "▲";
+    font-size: 12px;
+    opacity: .75
+}
+
+.th[data-dir="desc"]::after {
+    content: "▼";
+    font-size: 12px;
+    opacity: .75
+}
+
+/* === Table action button: "Редагувати" === */
+.btn-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    transition: background-color .2s, border-color .2s, box-shadow .2s, transform .06s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-edit:hover {
+    background: #f3f4f6;
+}
+
+.btn-edit:active {
+    transform: translateY(1px);
+}
+
+.btn-edit:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .35);
+}
+
+.btn-edit:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* ===== Modal (overlay) ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .5);
+    backdrop-filter: saturate(120%) blur(2px);
+    display: grid;
+    place-items: center;
+    z-index: 999;
+}
+
+/* Вікно */
+.modal {
+    width: min(920px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+    display: grid;
+    grid-template-rows:auto 1fr auto;
+    overflow: hidden;
+}
+
+/* Хедер */
+.modal__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal__top h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* Тіло */
+.modal__body {
+    padding: 16px;
+    overflow: auto;
+}
+
+/* Футер */
+.modal__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.modal__actions .spacer {
+    flex: 1;
+}
+
+/* Помилка всередині модалки */
+.error {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    margin-bottom: 12px;
+}
+
+/* ===== Форма в модалці ===== */
+.form2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form2 label {
+    display: grid;
+    gap: 6px;
+}
+
+.form2 label span {
+    font-weight: 700;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.form2 input[type="text"],
+.form2 input[type="number"],
+.form2 input[inputmode="decimal"],
+.form2 input {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: border-color .12s, box-shadow .12s;
+}
+
+.form2 input:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, .22);
+}
+
+.form2 .span2 {
+    grid-column: 1 / -1;
+}
+
+/* Прев'ю під полями (якщо є) */
+.preview {
+    margin-top: 12px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: #0f172a;
+}
+
+/* ===== Segmented control "Так / Ні" ===== */
+.seg-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0;
+}
+
+.field-label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.seg {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #f3f4f6;
+}
+
+.seg-btn {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #0f172a;
+    transition: background-color .2s, color .2s, transform .06s;
+}
+
+.seg-btn.is-active {
+    background: #0f172a;
+    color: #fff;
+}
+
+.seg-btn:active {
+    transform: translateY(1px);
+}
+
+.seg-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .35);
+}
+
+/* Кнопка закриття - стилі вже є як .btn-x, просто підстрахуємо розміри */
+.btn-x {
+    width: 40px;
+    height: 40px;
+}
+
+/* Мобільні правки */
+@media (max-width: 520px) {
+    .modal {
+        width: calc(100vw - 16px);
+        max-height: calc(100vh - 16px);
+        border-radius: 14px;
+    }
+
+    .form2 {
+        grid-template-columns: 1fr;
+    }
+
+    .modal__actions {
+        flex-wrap: wrap;
+    }
+
+    .modal__actions .spacer {
+        flex-basis: 100%;
+        height: 0;
+    }
+}
+/* гарантуємо, що IO бачить елемент і не відкладає його */
+.pack-media { content-visibility: visible !important; }
+
+/* ================== СТИЛІ ДЛЯ НЕДОСТУПНИХ ПАКУВАНЬ ================== */
+
+/*.pack-card.not-available {*/
+/*    position: relative;*/
+/*}*/
+
+/*.pack-card.not-available::before {*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    right: 0;*/
+/*    bottom: 0;*/
+/*    background: rgba(248, 250, 252, 0.9);*/
+/*    border-radius: 12px;*/
+/*    z-index: 1;*/
+/*    pointer-events: none;*/
+/*}*/
+
+.availability-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #6b7280;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+/*.pack-card.not-available .pack-media::after {*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    right: 0;*/
+/*    bottom: 0;*/
+/*    background: linear-gradient(*/
+/*            135deg,*/
+/*            rgba(248, 250, 252, 0.9) 0%,*/
+/*            rgba(241, 245, 249, 0.8) 100%*/
+/*    );*/
+/*    border-radius: 12px;*/
+/*    z-index: 1;*/
+/*}*/
+
+/*.pack-card.not-available .pack-name,*/
+/*.pack-card.not-available .pack-sub,*/
+/*.pack-card.not-available .pack-price {*/
+/*    opacity: 0.6;*/
+/*    position: relative;*/
+/*    z-index: 1;*/
+/*}*/
+
+.pack-btn.disabled {
+    background: #f3f4f6 !important;
+    border: 1px solid #e5e7eb !important;
+    color: #9ca3af !important;
+    cursor: not-allowed;
+    position: relative;
+    z-index: 1;
+}
+
+.pack-qty-btn:disabled {
+    background: #f9fafb;
+    border-color: #f3f4f6;
+    color: #d1d5db;
+    cursor: not-allowed;
+}
+
+/*.pack-card.not-available .pack-qty-input {*/
+/*    background: #f9fafb;*/
+/*    border-color: #f3f4f6;*/
+/*    color: #9ca3af;*/
+/*}*/
+
+/*!* Заборонити взаємодію з карткою *!*/
+/*.pack-card.not-available {*/
+/*    cursor: default;*/
+/*}*/
+
+/*.pack-card.not-available:hover {*/
+/*    box-shadow: 0 0 0 1px #e5e7eb inset, 0 1px 2px rgba(15, 23, 42, .04);*/
+/*}*/

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ICandy } from "../../../models/ICandy";
 import "./candy.css";
 import { addToCart } from "@/cart/store.ts";
@@ -12,8 +12,7 @@ const uah = (n: number) =>
         maximumFractionDigits: 2,
     }).format(n);
 
-const showUAH = (n?: number) =>
-    typeof n === "number" ? uah(n) : "—";
+const showUAH = (n?: number) => (typeof n === "number" ? uah(n) : "—");
 
 export default function OneCandyPage({ candy }: Props) {
     const [qty, setQty] = useState(1);
@@ -52,17 +51,14 @@ export default function OneCandyPage({ candy }: Props) {
     const available = (candy as any).isAvailable !== false;
 
     const weightG = (candy as any).weightPerPiece ?? (candy as any).weightPerPieceG; // г/шт
-    const pricePerKg = (candy as any).pricePerKgSell as number | undefined;          // ₴/кг
+    const pricePerKg = (candy as any).pricePerKgSell as number | undefined; // ₴/кг
 
     const derivedPerPiece =
         typeof weightG === "number" && typeof pricePerKg === "number"
             ? (pricePerKg * weightG) / 1000
             : undefined;
 
-    const piecePrice =
-        (candy as any).pricePerPcsSell ??
-        derivedPerPiece ??
-        0;
+    const piecePrice = (candy as any).pricePerPcsSell ?? derivedPerPiece ?? 0;
 
     const canAdd = available && piecePrice > 0;
 
@@ -71,6 +67,45 @@ export default function OneCandyPage({ candy }: Props) {
 
     const decQty = () => setQty((q) => Math.max(1, q - 1));
     const incQty = () => setQty((q) => q + 1);
+
+    // таймер для зеленого стану
+    const successTimer = useRef<number | null>(null);
+
+    // === FX: pop + ripple + зеленіє на 1с ===
+    const onAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!canAdd) return;
+
+        // 1) бізнес-логіка
+        addToCart(candy, qty);
+
+        // 2) анімації
+        const btn = e.currentTarget;
+        const rect = btn.getBoundingClientRect();
+        btn.style.setProperty("--ink-x", `${e.clientX - rect.left}px`);
+        btn.style.setProperty("--ink-y", `${e.clientY - rect.top}px`);
+
+        // перезапуск pop/ripple
+        btn.classList.remove("is-pop", "is-ink", "is-success");
+        void btn.offsetWidth; // форсуємо reflow
+        btn.classList.add("is-pop", "is-ink", "is-success");
+
+        // прибираємо ефекти
+        window.setTimeout(() => btn.classList.remove("is-ink"), 500);
+        window.setTimeout(() => btn.classList.remove("is-pop"), 380);
+
+        // зелений стан ~1с
+        if (successTimer.current) window.clearTimeout(successTimer.current);
+        successTimer.current = window.setTimeout(() => {
+            btn.classList.remove("is-success");
+            successTimer.current = null;
+        }, 1000);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (successTimer.current) window.clearTimeout(successTimer.current);
+        };
+    }, []);
 
     return (
         <article className={`product-card ${available ? "" : "is-out"}`}>
@@ -99,9 +134,7 @@ export default function OneCandyPage({ candy }: Props) {
             {/* Хедер */}
             <div className="product-header">
                 <h3 className="product-title">{candy.name}</h3>
-                <span className="badge-pill">
-          {available ? "В наявності" : "Немає"}
-        </span>
+                <span className="badge-pill">{available ? "В наявності" : "Немає"}</span>
             </div>
 
             {/* Характеристики */}
@@ -159,11 +192,11 @@ export default function OneCandyPage({ candy }: Props) {
 
             {/* Кнопка */}
             <button
-                className="add-btn"
+                className="add-btn btn-add"
                 type="button"
                 disabled={!canAdd}
                 title={available ? "" : "Товару немає в наявності"}
-                onClick={() => canAdd && addToCart(candy, qty)}
+                onClick={onAddClick}
             >
                 Додати в кошик
             </button>
