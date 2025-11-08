@@ -15,12 +15,11 @@ import {
 import { usePackaging } from "@/services/packaging.service";
 import LazyImg from "@/components/LazyImg";
 
-const EAGER_COUNT = 8; // скільки перших карток грузимо одразу
+const EAGER_COUNT = 8;
 
 export default function PackagingPage() {
     const navigate = useNavigate();
 
-    // загальна вага з кошика (хінт "вмістить/не вмістить")
     const [totalWeightG, setTotalWeightG] = useState(0);
     useEffect(() => {
         const upd = () => setTotalWeightG(getTotals().totalWeightG);
@@ -28,7 +27,6 @@ export default function PackagingPage() {
         return onCartChange(upd);
     }, []);
 
-    // пакування з бекенду
     const { data: options = [], isLoading, isError } = usePackaging();
 
     // Діагностика - логування даних
@@ -40,7 +38,7 @@ export default function PackagingPage() {
         }
     }, [options]);
 
-    // локальні степпери (дефолт 1)
+    // локальні степпери
     const [qty, setQty] = useState<Record<string, number>>({});
     const setLocal = (id: string, v: number) =>
         setQty((m) => ({ ...m, [id]: Math.max(1, Math.floor(v) || 1) }));
@@ -54,7 +52,7 @@ export default function PackagingPage() {
         return ok ? "✅ вмістить поточну вагу" : "⚠️ не вмістить поточну вагу";
     };
 
-    // === Сортування: спочатку доступні, потім недоступні, всередині груп за ціною ===
+    // === Сортування ===
     const items = useMemo(() => {
         const isAvail = (p: any) => p?.isAvailable !== false;
         const priceOf = (p: any) =>
@@ -64,11 +62,11 @@ export default function PackagingPage() {
         arr.sort((a: any, b: any) => {
             const avA = isAvail(a) ? 1 : 0;
             const avB = isAvail(b) ? 1 : 0;
-            if (avA !== avB) return avB - avA; // доступні — першими
+            if (avA !== avB) return avB - avA;
 
             const pa = priceOf(a);
             const pb = priceOf(b);
-            if (pa !== pb) return pa - pb; // від дешевих до дорогих
+            if (pa !== pb) return pa - pb;
 
             return String(a?.name ?? "").localeCompare(String(b?.name ?? ""), "uk");
         });
@@ -76,7 +74,9 @@ export default function PackagingPage() {
         console.log('Sorted items:', arr.map(item => ({
             name: item.name,
             isAvailable: item.isAvailable,
-            priceKop: item.priceKop
+            priceKop: item.priceKop,
+            _id: item._id, // Додаємо _id для діагностики
+            key: item.key
         })));
 
         return arr;
@@ -137,17 +137,26 @@ export default function PackagingPage() {
 
             <div className="pack-grid">
                 {items.map((p, i) => {
-                    const id = String((p as any).id ?? (p as any)._id);
+                    // ВИПРАВЛЕННЯ: Використовуємо _id замість key
+                    const id = String(p._id); // Тепер це буде "68f55f97f1405318be097b34"
                     const hint = hintFor(p);
                     const inCartQty = getPackQty(id);
                     const q = qty[id] ?? 1;
-                    const isAvailable = p.isAvailable !== false; // перевірка наявності
+                    const isAvailable = p.isAvailable !== false;
 
-                    console.log(`Rendering ${p.name}, isAvailable: ${p.isAvailable}, computed: ${isAvailable}`);
+                    console.log(`Rendering ${p.name}, ID: ${id}, isAvailable: ${isAvailable}`);
 
                     const onAdd = () => {
                         if (!isAvailable) return;
-                        addPack(p, q);
+
+                        // Створюємо об'єкт з правильним _id для передачі в кошик
+                        const packForCart = {
+                            ...p,
+                            id: id, // Передаємо _id як id
+                            packagingId: id // Додатково передаємо packagingId
+                        };
+
+                        addPack(packForCart, q);
                         setLocal(id, 1);
                         setFlash((s) => ({ ...s, [id]: true }));
                         if (timersRef.current[id]) clearTimeout(timersRef.current[id]);

@@ -27,15 +27,16 @@ export async function fetchPackaging(signal?: AbortSignal): Promise<IPackaging[]
     const data = (await res.json()) as ApiPackaging[];
 
     return data
-        // ВИДАЛИТИ цей фільтр, щоб отримувати всі пакування
-        // .filter(x => x.isAvailable !== false)
         .map<IPackaging>(d => ({
-            id: d.key,
+            // ВИПРАВЛЕННЯ: використовуємо _id замість key
+            id: d._id, // Тепер це буде ObjectId "68f55f97f1405318be097b34"
+            _id: d._id, // Додаємо також _id для повноти
+            key: d.key, // Зберігаємо key для внутрішніх потреб
             name: d.name,
             priceKop: toKop(d.priceSell),
             capacityG: d.capacityG,
             imageUrl: d.imageUrl || PACKAGING_IMG[(d.imageKey || d.key).toLowerCase()],
-            isAvailable: d.isAvailable, // ДОДАТИ це поле до IPackaging
+            isAvailable: d.isAvailable,
         }))
         .sort((a, b) => (b.priceKop - a.priceKop) || a.name.localeCompare(b.name, "uk"));
 }
